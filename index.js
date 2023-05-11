@@ -41,9 +41,17 @@ async function run() {
       const result = await services.findOne(query, option);
       res.send(result);
     })
-    app.post('/book-details', async(req, res) => {
+    app.post('/bookings', async(req, res) => {
       const bookInfo = req.body;
       const result = await bookings.insertOne(bookInfo);
+      res.send(result);
+    })
+    app.get('/all-bookings', async(req, res) => {
+      let query = {};
+      if(req.query?.email){
+        query = {email: req.query.email}
+      }
+      const result = await bookings.find(query).toArray();
       res.send(result);
     })
     // Send a ping to confirm a successful connection
