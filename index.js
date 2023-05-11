@@ -3,7 +3,7 @@ const app = express()
 const cors = require('cors');
 const port = process.env.PORT || 5000;
 require("dotenv").config();
-const { MongoClient, ServerApiVersion } = require('mongodb');
+const { MongoClient, ServerApiVersion, ObjectId } = require('mongodb');
 
 
 // middleware
@@ -27,9 +27,24 @@ async function run() {
     // Connect the client to the server	(optional starting in v4.7)
     await client.connect();
     const services = client.db('carDoctor').collection('services');
+    const bookings = client.db('carDoctor').collection('bookings');
     app.get('/services', async(req, res) => {
         const result = await services.find().toArray();
         res.send(result);
+    })
+    app.get('/service/:id', async(req, res) => {
+      const id = req.params.id;
+      const query = {_id: new ObjectId(id)};
+      const option = {
+        projection: {img:1, title:1, service_id:1, price:1 }
+      }
+      const result = await services.findOne(query, option);
+      res.send(result);
+    })
+    app.post('/book-details', async(req, res) => {
+      const bookInfo = req.body;
+      const result = await bookings.insertOne(bookInfo);
+      res.send(result);
     })
     // Send a ping to confirm a successful connection
     await client.db("admin").command({ ping: 1 });
