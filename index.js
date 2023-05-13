@@ -2,6 +2,7 @@ const express = require('express')
 const app = express()
 const cors = require('cors');
 const port = process.env.PORT || 5000;
+var jwt = require('jsonwebtoken');
 require("dotenv").config();
 const { MongoClient, ServerApiVersion, ObjectId } = require('mongodb');
 
@@ -45,6 +46,11 @@ async function run() {
       const bookInfo = req.body;
       const result = await bookings.insertOne(bookInfo);
       res.send(result);
+    })
+    // jwt
+    app.post('/jwt', (req, res) => {
+      const token = jwt.sign(req.body, process.env.ACCESS_TOKEN_SECRET, {expiresIn: '1h'});
+      res.send({token})
     })
     app.get('/all-bookings', async(req, res) => {
       let query = {};
